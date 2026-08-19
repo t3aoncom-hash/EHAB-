@@ -11,9 +11,9 @@
 
 <title>الشيخ إيهاب | متجر احتياجات المتجر</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/tailwindcss-cdn@3.4.10/tailwindcss.min.js"></script>
 
 <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -203,12 +203,15 @@ body.cart-open {
 
 
 /* =====================================================
-   CARDS
+   CARDS (إزالة الخلفية البيضاء والمربعات عن المنتجات)
 ===================================================== */
 
 .product-card,
 .category-card {
 
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
     transition:
         transform .25s ease,
         box-shadow .25s ease;
@@ -220,6 +223,11 @@ body.cart-open {
 
     transform: translateY(-4px);
 
+}
+
+.dark .product-card {
+    background: transparent !important;
+    border-color: transparent !important;
 }
 
 
@@ -431,16 +439,16 @@ body.cart-open {
 
 
 /* =====================================================
-   FAVORITES
+   FAVORITES & COMPANIES PAGES
 ===================================================== */
 
-.favorite-page {
+.page-animation {
 
-    animation: favoritePageIn .3s ease;
+    animation: pageIn .3s ease;
 
 }
 
-@keyframes favoritePageIn {
+@keyframes pageIn {
 
     from {
 
@@ -461,7 +469,7 @@ body.cart-open {
 }
 
 
-.favorite-header {
+.page-header {
 
     position: relative;
 
@@ -484,7 +492,7 @@ body.cart-open {
 
 }
 
-.favorite-header::before {
+.page-header::before {
 
     content: "";
 
@@ -504,7 +512,7 @@ body.cart-open {
 
 }
 
-.favorite-header::after {
+.page-header::after {
 
     content: "";
 
@@ -527,38 +535,25 @@ body.cart-open {
 .favorite-product {
 
     position: relative;
-
-    background: white;
-
-    border: 1px solid #f0f0f0;
-
-    border-radius: 26px;
-
+    background: transparent;
+    border: none;
+    border-radius: 20px;
     overflow: hidden;
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,.05);
-
-    transition:
-        transform .25s ease,
-        box-shadow .25s ease;
+    box-shadow: none;
+    transition: transform .25s ease;
 
 }
 
 .favorite-product:hover {
 
-    transform: translateY(-5px);
-
-    box-shadow:
-        0 15px 35px rgba(0,0,0,.10);
+    transform: translateY(-4px);
 
 }
 
 .dark .favorite-product {
 
-    background: #172033;
-
-    border-color: #293548;
+    background: transparent;
+    border-color: transparent;
 
 }
 
@@ -902,48 +897,6 @@ body.cart-open {
 
         </button>
 
-
-        <div
-            class="hidden md:block flex-1 max-w-xl">
-
-            <div class="relative">
-
-                <input
-                    id="desktop-search"
-                    oninput="searchProducts(this.value)"
-                    placeholder="ابحث عن منتج..."
-                    class="w-full bg-gray-100 rounded-2xl py-3.5 pr-12 pl-4 outline-none focus:ring-2 focus:ring-green-500">
-
-                <i
-                    data-lucide="search"
-                    class="absolute right-4 top-3.5 w-5 h-5 text-gray-400">
-                </i>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div
-        class="md:hidden px-4 pb-3">
-
-        <div class="relative">
-
-            <input
-                id="mobile-search"
-                oninput="searchProducts(this.value)"
-                placeholder="ابحث عن منتج..."
-                class="w-full bg-gray-100 rounded-xl py-3 pr-11 pl-4 outline-none focus:ring-2 focus:ring-green-500">
-
-            <i
-                data-lucide="search"
-                class="absolute right-3.5 top-3.5 w-5 h-5 text-gray-400">
-            </i>
-
-        </div>
-
     </div>
 
 </header>
@@ -1073,6 +1026,7 @@ body.cart-open {
                 </p>
 
                 <h2
+                    id="productsTitle"
                     class="text-2xl md:text-3xl font-black">
 
                     جميع المنتجات
@@ -1081,13 +1035,21 @@ body.cart-open {
 
             </div>
 
-            <span
-                id="productCount"
-                class="text-sm text-gray-400">
+            <div class="flex items-center gap-3">
+                <button
+                    id="clearFilterBtn"
+                    onclick="goHome()"
+                    class="hidden text-xs font-bold text-green-600 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-xl">
+                    إلغاء التصفية
+                </button>
+                <span
+                    id="productCount"
+                    class="text-sm text-gray-400">
 
-                0 منتج
+                    0 منتج
 
-            </span>
+                </span>
+            </div>
 
         </div>
 
@@ -1103,17 +1065,25 @@ body.cart-open {
 
 
 <!-- =====================================================
-     FAVORITES PAGE
+     DYNAMIC CATEGORY PAGE
 ===================================================== -->
 
 <section
-    id="favoritesPage"
-    class="favorite-page hidden max-w-7xl mx-auto px-4 py-6 md:py-10">
+    id="dynamicCategoryPage"
+    class="page-animation hidden max-w-7xl mx-auto px-4 py-6 md:py-10">
 
-    <!-- FAVORITE HEADER -->
+    <div class="mb-6 flex items-center justify-between">
+        <button
+            onclick="goHome()"
+            class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 px-5 py-2.5 rounded-2xl text-xs font-black flex items-center gap-2 shadow-sm">
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            العودة للرئيسية
+        </button>
+    </div>
 
     <div
-        class="favorite-header p-7 md:p-10 mb-8">
+        id="dynamicCategoryHeader"
+        class="page-header p-7 md:p-10 mb-8 bg-gradient-to-br from-green-700 via-green-800 to-emerald-950">
 
         <div
             class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -1124,66 +1094,31 @@ body.cart-open {
                     class="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-full px-4 py-2 mb-4">
 
                     <i
-                        data-lucide="heart"
-                        class="w-4 h-4 fill-current">
+                        data-lucide="tag"
+                        class="w-4 h-4">
                     </i>
 
                     <span class="text-xs font-bold">
-                        قائمة خاصة بك
+                        قسم مميز
                     </span>
 
                 </div>
 
                 <h2
+                    id="dynamicCategoryTitle"
                     class="text-3xl md:text-4xl font-black">
 
-                    المفضلة
+                    اسم القسم
 
                 </h2>
 
                 <p
+                    id="dynamicCategoryDesc"
                     class="text-green-100 mt-3 max-w-xl leading-7">
 
-                    المنتجات التي أعجبتك محفوظة هنا
-                    لتجدها بسهولة في أي وقت.
+                    تصفح منتجات هذا القسم بكل سهولة.
 
                 </p>
-
-            </div>
-
-
-            <div
-                class="shrink-0">
-
-                <div
-                    class="bg-white/10 border border-white/10 rounded-3xl px-6 py-5 min-w-[145px]">
-
-                    <p
-                        class="text-green-100 text-xs mb-1">
-
-                        المنتجات المحفوظة
-
-                    </p>
-
-                    <div
-                        class="flex items-center gap-2">
-
-                        <i
-                            data-lucide="heart"
-                            class="w-5 h-5 fill-current">
-                        </i>
-
-                        <strong
-                            id="favoriteCountHeader"
-                            class="text-2xl font-black">
-
-                            0
-
-                        </strong>
-
-                    </div>
-
-                </div>
 
             </div>
 
@@ -1191,8 +1126,49 @@ body.cart-open {
 
     </div>
 
+    <div class="mb-10" id="dynamicCategoryCompaniesWrapper">
+        <h3 class="text-xl md:text-2xl font-black mb-5">الشركات ذات الصلة</h3>
+        <div id="dynamicCategoryCompanies"></div>
+    </div>
 
-    <!-- FAVORITES CONTENT -->
+    <div>
+        <h3 class="text-xl md:text-2xl font-black mb-5">منتجات القسم</h3>
+        <div id="dynamicCategoryProducts" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5"></div>
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     COMPANIES PAGE
+===================================================== -->
+
+<section
+    id="companiesPage"
+    class="page-animation hidden max-w-7xl mx-auto px-4 py-6 md:py-10">
+
+    <div class="mb-6 relative">
+        <input
+            type="text"
+            id="companySearchInput"
+            oninput="filterCompaniesSearch()"
+            placeholder="ابحث عن اسم الشركة..."
+            class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-4 pr-12 text-sm font-bold outline-none focus:border-green-500 shadow-sm">
+        <i data-lucide="search" class="absolute right-4 top-4 w-5 h-5 text-gray-400"></i>
+    </div>
+
+    <div id="companiesContent"></div>
+
+</section>
+
+
+<!-- =====================================================
+     FAVORITES PAGE
+===================================================== -->
+
+<section
+    id="favoritesPage"
+    class="page-animation hidden max-w-7xl mx-auto px-4 py-6 md:py-10">
 
     <div
         id="favoritesContent">
@@ -1208,35 +1184,14 @@ body.cart-open {
 
 <section
     id="settingsPage"
-    class="hidden max-w-2xl mx-auto px-4 py-7">
+    class="page-animation hidden max-w-2xl mx-auto px-4 py-7">
 
     <div class="mb-7">
-
-        <p
-            class="text-green-600 text-sm font-bold mb-1">
-
-            التحكم
-
-        </p>
-
-        <h2
-            class="text-3xl font-black">
-
+        <h2 class="text-3xl font-black">
             الإعدادات
-
         </h2>
-
-        <p
-            class="text-gray-400 text-sm mt-2">
-
-            تحكم في تجربة استخدام المتجر
-
-        </p>
-
     </div>
 
-
-    <!-- DARK MODE -->
 
     <div
         class="settings-card bg-white border border-gray-100 rounded-3xl p-5 shadow-sm mb-4">
@@ -1296,8 +1251,6 @@ body.cart-open {
     </div>
 
 
-    <!-- PREVIOUS ORDERS -->
-
     <button
         onclick="openPreviousOrders()"
         class="settings-card w-full bg-white border border-gray-100 rounded-3xl p-5 shadow-sm text-right mb-4">
@@ -1339,8 +1292,6 @@ body.cart-open {
 
     </button>
 
-
-    <!-- STORE INFO -->
 
     <div
         class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm">
@@ -1391,9 +1342,6 @@ body.cart-open {
     <div
         class="max-w-xl mx-auto h-full px-1 flex items-center justify-around">
 
-
-        <!-- HOME -->
-
         <button
             id="navHome"
             onclick="goHome()"
@@ -1407,40 +1355,18 @@ body.cart-open {
 
         </button>
 
-
-        <!-- CATEGORIES -->
-
         <button
-            id="navCategories"
-            onclick="showStore(); scrollCategories()"
+            id="navCompanies"
+            onclick="showCompanies()"
             class="bottom-nav-item flex flex-col items-center justify-center gap-1 text-gray-400">
 
-            <i data-lucide="layout-grid"></i>
+            <i data-lucide="building-2"></i>
 
             <span class="text-[10px] font-bold">
-                الأقسام
+                الشركات
             </span>
 
         </button>
-
-
-        <!-- SEARCH -->
-
-        <button
-            id="navSearch"
-            onclick="showStore(); focusSearch()"
-            class="bottom-nav-item flex flex-col items-center justify-center gap-1 text-gray-400">
-
-            <i data-lucide="search"></i>
-
-            <span class="text-[10px] font-bold">
-                البحث
-            </span>
-
-        </button>
-
-
-        <!-- FAVORITES -->
 
         <button
             id="navFavorites"
@@ -1469,9 +1395,6 @@ body.cart-open {
 
         </button>
 
-
-        <!-- CART -->
-
         <button
             id="navCart"
             onclick="toggleCart()"
@@ -1497,9 +1420,6 @@ body.cart-open {
 
         </button>
 
-
-        <!-- SETTINGS -->
-
         <button
             id="navSettings"
             onclick="showSettings()"
@@ -1519,7 +1439,7 @@ body.cart-open {
 
 
 <!-- =====================================================
-     CART OVERLAY
+     CART OVERLAY & DRAWER
 ===================================================== -->
 
 <div
@@ -1527,11 +1447,6 @@ body.cart-open {
     onclick="toggleCart()"
     class="fixed inset-0 bg-black/50 z-[9990] hidden">
 </div>
-
-
-<!-- =====================================================
-     CART DRAWER
-===================================================== -->
 
 <div
     id="cartDrawer"
@@ -1601,7 +1516,7 @@ body.cart-open {
 
 
 <!-- =====================================================
-     CHECKOUT
+     CHECKOUT MODAL
 ===================================================== -->
 
 <div
@@ -1716,7 +1631,7 @@ body.cart-open {
 
 
 <!-- =====================================================
-     SUCCESS
+     SUCCESS MODAL
 ===================================================== -->
 
 <div
@@ -1844,7 +1759,7 @@ body.cart-open {
 
 
 <!-- =====================================================
-     TOAST
+     TOAST CONTAINER
 ===================================================== -->
 
 <div id="toastContainer"></div>
@@ -1876,6 +1791,8 @@ supabase.createClient(
 let categories = [];
 
 let products = [];
+
+let companies = [];
 
 let cart = [];
 
@@ -2011,23 +1928,9 @@ function updateFavoriteCount() {
         );
 
 
-    const header =
-        document.getElementById(
-            "favoriteCountHeader"
-        );
-
-
     if (bottom) {
 
         bottom.innerText =
-            count;
-
-    }
-
-
-    if (header) {
-
-        header.innerText =
             count;
 
     }
@@ -2166,6 +2069,17 @@ async function loadStore() {
         categoriesResult.data || [];
 
 
+    const companiesResult =
+        await db
+        .from("companies")
+        .select("*")
+        .order("id");
+
+    if (!companiesResult.error) {
+        companies = companiesResult.data || [];
+    }
+
+
     const productsResult =
         await db
         .from("products")
@@ -2202,6 +2116,8 @@ async function loadStore() {
 
     renderCategories();
 
+    renderCompanies(companies);
+
     renderProducts(products);
 
     renderFavorites();
@@ -2214,74 +2130,121 @@ async function loadStore() {
 
 
 /* =====================================================
-   CATEGORIES
+   CATEGORIES STYLING & RENDERING
 ===================================================== */
 
+function getCategoryColor(name) {
+    const n = (name || "").toLowerCase();
+    if (n.includes("شوكولاته") || n.includes("شيكولاتة") || n.includes("كاكاو")) {
+        return { bg: "bg-amber-100 dark:bg-amber-900/30", text: "text-amber-800 dark:text-amber-300", border: "border-amber-200 dark:border-amber-800" };
+    }
+    if (n.includes("مشروبات") || n.includes("عصير") || n.includes("قهوة") || n.includes("شاي")) {
+        return { bg: "bg-orange-100 dark:bg-orange-900/30", text: "text-orange-800 dark:text-orange-300", border: "border-orange-200 dark:border-orange-800" };
+    }
+    if (n.includes("بسكويت") || n.includes("مخبوزات") || n.includes("كعك")) {
+        return { bg: "bg-yellow-100 dark:bg-yellow-900/30", text: "text-yellow-800 dark:text-yellow-300", border: "border-yellow-200 dark:border-yellow-800" };
+    }
+    if (n.includes("منظفات") || n.includes("صابون")) {
+        return { bg: "bg-blue-100 dark:bg-blue-900/30", text: "text-blue-800 dark:text-blue-300", border: "border-blue-200 dark:border-blue-800" };
+    }
+    return { bg: "bg-emerald-100 dark:bg-emerald-900/30", text: "text-emerald-800 dark:text-emerald-300", border: "border-emerald-200 dark:border-emerald-800" };
+}
+
 function renderCategories() {
-
-    const box =
-        document.getElementById(
-            "categories"
-        );
-
+    const box = document.getElementById("categories");
+    if (!box) return;
 
     if (!categories.length) {
+        box.innerHTML = `<div class="col-span-full text-center py-6 text-gray-400">لا توجد أقسام متاحة</div>`;
+        return;
+    }
+
+    box.innerHTML = categories.map(category => {
+        const colors = getCategoryColor(category.name);
+        return `
+            <button
+                onclick="openDynamicCategoryPage(${category.id}, '${escapeAttribute(category.name)}', '${escapeAttribute(category.description || '')}')"
+                class="category-card ${colors.bg} border ${colors.border} rounded-2xl p-4 text-center shadow-sm hover:shadow-md transition flex flex-col items-center justify-center">
+                <div class="w-12 h-12 mx-auto rounded-2xl bg-white dark:bg-slate-800 ${colors.text} flex items-center justify-center mb-2 shadow-sm">
+                    <i data-lucide="${escapeHTML(category.icon || "package")}"></i>
+                </div>
+                <h3 class="font-black text-sm ${colors.text}">${escapeHTML(category.name)}</h3>
+            </button>
+        `;
+    }).join("");
+
+    lucide.createIcons();
+}
+
+
+/* =====================================================
+   COMPANIES (تم التعديل لتصبح 3 أعمدة بدلاً من عمودين أو أكثر)
+===================================================== */
+
+function renderCompanies(listToRender = companies) {
+
+    const box = document.getElementById("companiesContent");
+
+    if (!box) return;
+
+    if (!listToRender.length) {
 
         box.innerHTML = `
-
-            <div
-                class="col-span-full text-center py-10 text-gray-400">
-
-                لا توجد أقسام
-
+            <div class="favorite-empty bg-white rounded-[30px] border border-gray-100 shadow-sm p-8">
+                <div>
+                    <div class="favorite-empty-icon">
+                        <i data-lucide="building-2" class="w-11 h-11"></i>
+                    </div>
+                    <h3 class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
+                        لا توجد شركات مطابقة للبحث
+                    </h3>
+                    <p class="text-gray-400 max-w-md mx-auto mt-3 leading-7">
+                        يرجى التأكد من اسم الشركة المدخل في البحث.
+                    </p>
+                </div>
             </div>
-
         `;
 
+        lucide.createIcons();
         return;
 
     }
 
+    box.innerHTML = `
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-6">
+            ${listToRender.map(company => `
+                <button
+                    onclick="filterCompany(${company.id}, '${escapeAttribute(company.name)}')"
+                    class="group flex flex-col items-center p-2 md:p-3 transition-all duration-300">
+                    
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full overflow-hidden shadow-md mb-2 md:mb-3 bg-gray-100 flex items-center justify-center">
+                        <img
+                            src="${escapeAttribute(company.image || company.logo || 'https://placehold.co/200x200?text=Logo')}"
+                            alt="${escapeAttribute(company.name)}"
+                            class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                            onerror="this.src='https://placehold.co/200x200?text=Logo'">
+                    </div>
 
-    box.innerHTML =
-
-        categories.map(category => `
-
-            <button
-                onclick="filterCategory(${category.id})"
-                class="category-card bg-white border border-gray-100 rounded-2xl p-4 text-center shadow-sm hover:shadow-md">
-
-                <div
-                    class="w-14 h-14 mx-auto rounded-2xl bg-green-50 text-green-600 flex items-center justify-center mb-3">
-
-                    <i
-                        data-lucide="${escapeHTML(category.icon || "package")}">
-                    </i>
-
-                </div>
-
-                <h3 class="font-black text-sm">
-
-                    ${escapeHTML(category.name)}
-
-                </h3>
-
-                <p
-                    class="text-[11px] text-gray-400 mt-1 line-clamp-2">
-
-                    ${escapeHTML(
-                        category.description || ""
-                    )}
-
-                </p>
-
-            </button>
-
-        `).join("");
-
+                    <h3 class="font-black text-xs sm:text-sm md:text-base text-gray-900 dark:text-white text-center line-clamp-1">
+                        ${escapeHTML(company.name)}
+                    </h3>
+                </button>
+            `).join("")}
+        </div>
+    `;
 
     lucide.createIcons();
 
+}
+
+function filterCompaniesSearch() {
+    const query = document.getElementById("companySearchInput").value.trim().toLowerCase();
+    if (!query) {
+        renderCompanies(companies);
+        return;
+    }
+    const filtered = companies.filter(c => (c.name || "").toLowerCase().includes(query));
+    renderCompanies(filtered);
 }
 
 
@@ -2309,13 +2272,22 @@ function getStock(product) {
 
 
 /* =====================================================
-   PRODUCT CARD
+   PRODUCT CARD (بدون خلفية بيضاء أو مربعات)
 ===================================================== */
 
-function renderProducts(list) {
+function renderProducts(list, customTitle = "جميع المنتجات") {
 
     currentProductList =
         list;
+
+    document.getElementById("productsTitle").innerText = customTitle;
+
+    const clearBtn = document.getElementById("clearFilterBtn");
+    if (customTitle !== "جميع المنتجات") {
+        clearBtn.classList.remove("hidden");
+    } else {
+        clearBtn.classList.add("hidden");
+    }
 
 
     const box =
@@ -2337,7 +2309,7 @@ function renderProducts(list) {
             <div
                 class="col-span-full bg-white rounded-2xl p-12 text-center text-gray-400">
 
-                لا توجد منتجات في هذا القسم حاليًا
+                لا توجد منتجات متاحة هنا حاليًا
 
             </div>
 
@@ -2365,7 +2337,7 @@ function renderProducts(list) {
             return `
 
                 <article
-                    class="product-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
+                    class="product-card rounded-3xl overflow-hidden">
 
                     <div class="relative">
 
@@ -2374,11 +2346,9 @@ function renderProducts(list) {
                                 product.image ||
                                 "https://placehold.co/600x450?text=Product"
                             )}"
-                            class="w-full h-48 object-cover"
+                            class="w-full h-48 object-cover rounded-3xl"
                             onerror="this.src='https://placehold.co/600x450?text=Product'">
 
-
-                        <!-- FAVORITE BUTTON -->
 
                         <button
                             onclick="toggleFavorite(${product.id})"
@@ -2414,7 +2384,7 @@ function renderProducts(list) {
                             `
 
                             <div
-                                class="absolute inset-0 bg-black/45 flex items-center justify-center">
+                                class="absolute inset-0 bg-black/45 flex items-center justify-center rounded-3xl">
 
                                 <span
                                     class="bg-red-600 text-white px-4 py-2 rounded-xl font-black text-sm shadow-lg">
@@ -2453,7 +2423,7 @@ function renderProducts(list) {
                     </div>
 
 
-                    <div class="p-5">
+                    <div class="py-3 px-1">
 
                         <h3
                             class="font-black text-base line-clamp-2 min-h-[48px]">
@@ -2471,7 +2441,7 @@ function renderProducts(list) {
                             `
 
                             <p
-                                class="text-xs text-gray-400 mt-2 line-clamp-2">
+                                class="text-xs text-gray-400 mt-1 line-clamp-2">
 
                                 ${escapeHTML(
                                     product.description
@@ -2489,7 +2459,7 @@ function renderProducts(list) {
 
 
                         <div
-                            class="flex items-center justify-between gap-2 mt-5">
+                            class="flex items-center justify-between gap-2 mt-3">
 
                             <div>
 
@@ -2567,6 +2537,83 @@ function renderProducts(list) {
 
     lucide.createIcons();
 
+}
+
+
+/* =====================================================
+   DYNAMIC CATEGORY PAGE RENDERING
+===================================================== */
+
+function openDynamicCategoryPage(categoryId, categoryName, categoryDesc) {
+    document.getElementById("storePage").classList.add("hidden");
+    document.getElementById("companiesPage").classList.add("hidden");
+    document.getElementById("favoritesPage").classList.add("hidden");
+    document.getElementById("settingsPage").classList.add("hidden");
+    document.getElementById("dynamicCategoryPage").classList.remove("hidden");
+
+    document.getElementById("dynamicCategoryTitle").innerText = categoryName;
+    document.getElementById("dynamicCategoryDesc").innerText = categoryDesc || "تصفح منتجات هذا القسم بكل سهولة.";
+
+    const compBox = document.getElementById("dynamicCategoryCompanies");
+    const compWrapper = document.getElementById("dynamicCategoryCompaniesWrapper");
+    
+    if (companies.length) {
+        compWrapper.style.display = "block";
+        compBox.innerHTML = `
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+                ${companies.map(company => `
+                    <button
+                        onclick="filterCompany(${company.id}, '${escapeAttribute(company.name)}'); showStore();"
+                        class="flex flex-col items-center p-2 transition">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden mb-2 bg-gray-100 flex items-center justify-center">
+                            <img src="${escapeAttribute(company.image || company.logo || 'https://placehold.co/100x100?text=Logo')}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100?text=Logo'">
+                        </div>
+                        <h4 class="font-black text-xs text-gray-900 dark:text-white line-clamp-1">${escapeHTML(company.name)}</h4>
+                    </button>
+                `).join("")}
+            </div>
+        `;
+    } else {
+        compWrapper.style.display = "none";
+    }
+
+    const catProducts = products.filter(p => Number(p.category_id) === Number(categoryId));
+    const prodBox = document.getElementById("dynamicCategoryProducts");
+
+    if (!catProducts.length) {
+        prodBox.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-12 text-center text-gray-400">لا توجد منتجات متاحة في هذا القسم حاليًا</div>`;
+    } else {
+        prodBox.innerHTML = catProducts.map(product => {
+            const stock = getStock(product);
+            const unavailable = stock <= 0;
+            const favorite = isFavorite(product.id);
+
+            return `
+                <article class="product-card rounded-3xl overflow-hidden">
+                    <div class="relative">
+                        <img src="${escapeAttribute(product.image || "https://placehold.co/600x450?text=Product")}" class="w-full h-48 object-cover rounded-3xl" onerror="this.src='https://placehold.co/600x450?text=Product'">
+                        <button onclick="toggleFavorite(${product.id})" class="absolute top-3 left-3 z-10 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition ${favorite ? "bg-red-500 text-white" : "bg-white/95 text-gray-500"}">
+                            <i data-lucide="heart" class="w-5 h-5 ${favorite ? "fill-current" : ""}"></i>
+                        </button>
+                        ${unavailable ? '<div class="absolute inset-0 bg-black/45 flex items-center justify-center rounded-3xl"><span class="bg-red-600 text-white px-4 py-2 rounded-xl font-black text-sm shadow-lg">غير متوفر</span></div>' : ''}
+                    </div>
+                    <div class="py-3 px-1">
+                        <h3 class="font-black text-base line-clamp-2 min-h-[48px]">${escapeHTML(product.name)}</h3>
+                        <div class="flex items-center justify-between gap-2 mt-3">
+                            <div>
+                                <p class="text-xs text-gray-400">السعر</p>
+                                <strong class="text-xl text-green-600 font-black">${Number(product.price).toFixed(2)} <span class="text-xs">ج.م</span></strong>
+                            </div>
+                            ${unavailable ? '<button disabled class="bg-gray-200 text-gray-400 px-4 py-3 rounded-xl font-bold cursor-not-allowed">غير متوفر</button>' : `<button onclick="addToCart(${product.id})" class="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-xl font-bold flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i>السلة</button>`}
+                        </div>
+                    </div>
+                </article>
+            `;
+        }).join("");
+    }
+
+    lucide.createIcons();
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 
@@ -2719,10 +2766,6 @@ function renderFavorites() {
 }
 
 
-/* =====================================================
-   FAVORITE CARD
-===================================================== */
-
 function renderFavoriteCard(product) {
 
     const stock =
@@ -2735,10 +2778,10 @@ function renderFavoriteCard(product) {
     return `
 
         <article
-            class="favorite-product">
+            class="favorite-product rounded-3xl overflow-hidden p-1">
 
             <div
-                class="favorite-image-wrapper">
+                class="favorite-image-wrapper rounded-3xl overflow-hidden">
 
                 <img
                     src="${escapeAttribute(
@@ -2815,10 +2858,10 @@ function renderFavoriteCard(product) {
 
 
             <div
-                class="p-4 md:p-5">
+                class="py-3 px-1">
 
                 <h3
-                    class="font-black text-sm md:text-base line-clamp-2 min-h-[42px]">
+                    class="font-black text-sm md:text-base line-clamp-2 min-h-[42px] text-gray-900 dark:text-white">
 
                     ${escapeHTML(product.name)}
 
@@ -2833,7 +2876,7 @@ function renderFavoriteCard(product) {
                     `
 
                     <p
-                        class="text-xs text-gray-400 mt-2 line-clamp-2">
+                        class="text-xs text-gray-400 mt-1 line-clamp-2">
 
                         ${escapeHTML(
                             product.description
@@ -2851,7 +2894,7 @@ function renderFavoriteCard(product) {
 
 
                 <div
-                    class="flex items-end justify-between gap-2 mt-4">
+                    class="flex items-end justify-between gap-2 mt-2">
 
                     <div>
 
@@ -2892,7 +2935,7 @@ function renderFavoriteCard(product) {
 
                     <button
                         disabled
-                        class="w-full mt-4 bg-gray-100 text-gray-400 py-3 rounded-xl font-bold text-xs md:text-sm">
+                        class="w-full mt-3 bg-gray-100 dark:bg-slate-700 text-gray-400 py-2.5 rounded-xl font-bold text-xs">
 
                         غير متوفر حاليًا
 
@@ -2906,7 +2949,7 @@ function renderFavoriteCard(product) {
 
                     <button
                         onclick="addToCart(${product.id})"
-                        class="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-black text-xs md:text-sm flex items-center justify-center gap-2">
+                        class="w-full mt-3 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-xl font-black text-xs md:text-sm flex items-center justify-center gap-2 shadow-sm">
 
                         <i
                             data-lucide="shopping-cart"
@@ -2929,10 +2972,6 @@ function renderFavoriteCard(product) {
 
 }
 
-
-/* =====================================================
-   CLEAR FAVORITES
-===================================================== */
 
 function clearFavorites() {
 
@@ -2975,57 +3014,24 @@ function clearFavorites() {
 
 
 /* =====================================================
-   CATEGORY FILTER
+   FILTERS
 ===================================================== */
 
-function filterCategory(categoryId) {
+function filterCompany(companyId, companyName) {
 
     const filtered =
         products.filter(
             product =>
-                Number(product.category_id) ===
-                Number(categoryId)
+                Number(product.company_id) ===
+                Number(companyId)
         );
 
 
     showStore();
 
-    renderProducts(filtered);
+    renderProducts(filtered, `شركة: ${companyName}`);
 
     scrollProducts();
-
-}
-
-
-/* =====================================================
-   SEARCH
-===================================================== */
-
-function searchProducts(value) {
-
-    const query =
-        value.trim().toLowerCase();
-
-
-    const filtered =
-        products.filter(product =>
-
-            String(product.name || "")
-            .toLowerCase()
-            .includes(query)
-
-            ||
-
-            String(product.description || "")
-            .toLowerCase()
-            .includes(query)
-
-        );
-
-
-    showStore();
-
-    renderProducts(filtered);
 
 }
 
@@ -3136,10 +3142,6 @@ function addToCart(id) {
 }
 
 
-/* =====================================================
-   QUANTITY
-===================================================== */
-
 function changeQuantity(id, amount) {
 
     const item =
@@ -3206,10 +3208,6 @@ function changeQuantity(id, amount) {
 }
 
 
-/* =====================================================
-   CART TOTAL
-===================================================== */
-
 function cartTotal() {
 
     return cart.reduce(
@@ -3226,10 +3224,6 @@ function cartTotal() {
 
 }
 
-
-/* =====================================================
-   UPDATE CART
-===================================================== */
 
 function updateCart() {
 
@@ -3413,10 +3407,6 @@ function updateCart() {
 }
 
 
-/* =====================================================
-   TOGGLE CART
-===================================================== */
-
 function toggleCart() {
 
     const drawer =
@@ -3494,7 +3484,7 @@ function toggleCart() {
 
 
 /* =====================================================
-   CHECKOUT
+   CHECKOUT & ORDERS
 ===================================================== */
 
 function openCheckout() {
@@ -3535,10 +3525,6 @@ function openCheckout() {
 }
 
 
-/* =====================================================
-   CLOSE CHECKOUT
-===================================================== */
-
 function closeCheckout() {
 
     const modal =
@@ -3557,10 +3543,6 @@ function closeCheckout() {
 
 }
 
-
-/* =====================================================
-   SUBMIT ORDER
-===================================================== */
 
 async function submitOrder() {
 
@@ -4020,10 +4002,6 @@ async function submitOrder() {
 }
 
 
-/* =====================================================
-   SUCCESS
-===================================================== */
-
 function closeSuccess() {
 
     const modal =
@@ -4042,10 +4020,6 @@ function closeSuccess() {
 
 }
 
-
-/* =====================================================
-   PREVIOUS ORDERS
-===================================================== */
 
 function openPreviousOrders() {
 
@@ -4098,10 +4072,6 @@ function closePreviousOrders() {
 
 }
 
-
-/* =====================================================
-   SEARCH PREVIOUS ORDERS
-===================================================== */
 
 async function searchPreviousOrders() {
 
@@ -4350,13 +4320,8 @@ async function searchPreviousOrders() {
 
         }).join("");
 
-
 }
 
-
-/* =====================================================
-   ORDER STATUS
-===================================================== */
 
 function getOrderStatus(status) {
 
@@ -4472,8 +4437,7 @@ function setActiveNav(activeId) {
     const ids = [
 
         "navHome",
-        "navCategories",
-        "navSearch",
+        "navCompanies",
         "navFavorites",
         "navCart",
         "navSettings"
@@ -4543,6 +4507,16 @@ function showStore() {
 
 
     document
+        .getElementById("dynamicCategoryPage")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("companiesPage")
+        .classList.add("hidden");
+
+
+    document
         .getElementById("favoritesPage")
         .classList.add("hidden");
 
@@ -4559,10 +4533,66 @@ function showStore() {
 }
 
 
+function showCompanies() {
+
+    document
+        .getElementById("storePage")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("dynamicCategoryPage")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("favoritesPage")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("settingsPage")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("companiesPage")
+        .classList.remove("hidden");
+
+
+    setActiveNav(
+        "navCompanies"
+    );
+
+
+    renderCompanies(companies);
+
+
+    window.scrollTo({
+
+        top: 0,
+
+        behavior: "smooth"
+
+    });
+
+}
+
+
 function showFavorites() {
 
     document
         .getElementById("storePage")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("dynamicCategoryPage")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("companiesPage")
         .classList.add("hidden");
 
 
@@ -4599,6 +4629,16 @@ function showSettings() {
 
     document
         .getElementById("storePage")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("dynamicCategoryPage")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("companiesPage")
         .classList.add("hidden");
 
 
@@ -4650,29 +4690,6 @@ function goHome() {
 }
 
 
-function scrollCategories() {
-
-    showStore();
-
-
-    document
-        .getElementById(
-            "categoriesSection"
-        )
-        .scrollIntoView({
-
-            behavior: "smooth"
-
-        });
-
-
-    setActiveNav(
-        "navCategories"
-    );
-
-}
-
-
 function scrollProducts() {
 
     showStore();
@@ -4692,57 +4709,6 @@ function scrollProducts() {
     setActiveNav(
         "navHome"
     );
-
-}
-
-
-/* =====================================================
-   SEARCH
-===================================================== */
-
-function focusSearch() {
-
-    showStore();
-
-
-    setActiveNav(
-        "navSearch"
-    );
-
-
-    const input =
-        window.innerWidth >= 768
-
-        ?
-
-        document.getElementById(
-            "desktop-search"
-        )
-
-        :
-
-        document.getElementById(
-            "mobile-search"
-        );
-
-
-    if (!input) return;
-
-
-    input.focus({
-
-        preventScroll: true
-
-    });
-
-
-    input.scrollIntoView({
-
-        behavior: "smooth",
-
-        block: "center"
-
-    });
 
 }
 
@@ -4848,10 +4814,6 @@ async function refreshProductsSilently() {
 
 }
 
-
-/* =====================================================
-   AUTO REFRESH
-===================================================== */
 
 const AUTO_REFRESH_TIME =
     10 * 60 * 1000;
