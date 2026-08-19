@@ -1127,7 +1127,7 @@ body.cart-open {
     </div>
 
     <div class="mb-10" id="dynamicCategoryCompaniesWrapper">
-        <h3 class="text-xl md:text-2xl font-black mb-5">الشركات ذات الصلة</h3>
+        <h3 class="text-xl md:text-2xl font-black mb-5">الشركات ذات الصلة بهذا القسم</h3>
         <div id="dynamicCategoryCompanies"></div>
     </div>
 
@@ -2178,7 +2178,7 @@ function renderCategories() {
 
 
 /* =====================================================
-   COMPANIES (تم التعديل لتصبح 3 أعمدة بدلاً من عمودين أو أكثر)
+   COMPANIES
 ===================================================== */
 
 function renderCompanies(listToRender = companies) {
@@ -2272,7 +2272,7 @@ function getStock(product) {
 
 
 /* =====================================================
-   PRODUCT CARD (بدون خلفية بيضاء أو مربعات)
+   PRODUCT CARD
 ===================================================== */
 
 function renderProducts(list, customTitle = "جميع المنتجات") {
@@ -2541,7 +2541,7 @@ function renderProducts(list, customTitle = "جميع المنتجات") {
 
 
 /* =====================================================
-   DYNAMIC CATEGORY PAGE RENDERING
+   DYNAMIC CATEGORY PAGE RENDERING (عرض الشركات التابعة للقسم فقط)
 ===================================================== */
 
 function openDynamicCategoryPage(categoryId, categoryName, categoryDesc) {
@@ -2557,18 +2557,27 @@ function openDynamicCategoryPage(categoryId, categoryName, categoryDesc) {
     const compBox = document.getElementById("dynamicCategoryCompanies");
     const compWrapper = document.getElementById("dynamicCategoryCompaniesWrapper");
     
-    if (companies.length) {
+    // فلترة المنتجات التابعة لهذا القسم فقط
+    const catProducts = products.filter(p => Number(p.category_id) === Number(categoryId));
+    
+    // استخراج أيدي الشركات التي تمتلك منتجات داخل هذا القسم فقط
+    const relatedCompanyIds = [...new Set(catProducts.map(p => Number(p.company_id)).filter(Boolean))];
+    
+    // جلب بيانات الشركات الموجودة فعلياً في هذا القسم
+    const relatedCompanies = companies.filter(c => relatedCompanyIds.includes(Number(c.id)));
+
+    if (relatedCompanies.length) {
         compWrapper.style.display = "block";
         compBox.innerHTML = `
             <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
-                ${companies.map(company => `
+                ${relatedCompanies.map(company => `
                     <button
-                        onclick="filterCompany(${company.id}, '${escapeAttribute(company.name)}'); showStore();"
-                        class="flex flex-col items-center p-2 transition">
-                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden mb-2 bg-gray-100 flex items-center justify-center">
+                        onclick="filterCompanyAndCategory(${company.id}, ${categoryId}, '${escapeAttribute(company.name)}')"
+                        class="flex flex-col items-center p-2 transition group">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden mb-2 bg-gray-100 flex items-center justify-center shadow-sm group-hover:scale-105 transition">
                             <img src="${escapeAttribute(company.image || company.logo || 'https://placehold.co/100x100?text=Logo')}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100?text=Logo'">
                         </div>
-                        <h4 class="font-black text-xs text-gray-900 dark:text-white line-clamp-1">${escapeHTML(company.name)}</h4>
+                        <h4 class="font-black text-xs text-gray-900 dark:text-white line-clamp-1 text-center">${escapeHTML(company.name)}</h4>
                     </button>
                 `).join("")}
             </div>
@@ -2577,7 +2586,6 @@ function openDynamicCategoryPage(categoryId, categoryName, categoryDesc) {
         compWrapper.style.display = "none";
     }
 
-    const catProducts = products.filter(p => Number(p.category_id) === Number(categoryId));
     const prodBox = document.getElementById("dynamicCategoryProducts");
 
     if (!catProducts.length) {
@@ -2598,7 +2606,7 @@ function openDynamicCategoryPage(categoryId, categoryName, categoryDesc) {
                         ${unavailable ? '<div class="absolute inset-0 bg-black/45 flex items-center justify-center rounded-3xl"><span class="bg-red-600 text-white px-4 py-2 rounded-xl font-black text-sm shadow-lg">غير متوفر</span></div>' : ''}
                     </div>
                     <div class="py-3 px-1">
-                        <h3 class="font-black text-base line-clamp-2 min-h-[48px]">${escapeHTML(product.name)}</h3>
+                        <h3 class="font-black text-sm md:text-base line-clamp-2 min-h-[48px]">${escapeHTML(product.name)}</h3>
                         <div class="flex items-center justify-between gap-2 mt-3">
                             <div>
                                 <p class="text-xs text-gray-400">السعر</p>
@@ -2614,6 +2622,16 @@ function openDynamicCategoryPage(categoryId, categoryName, categoryDesc) {
 
     lucide.createIcons();
     window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// دالة إضافية لتصفية منتجات شركة معينة داخل القسم المحدد
+function filterCompanyAndCategory(companyId, categoryId, companyName) {
+    const filtered = products.filter(
+        product => Number(product.company_id) === Number(companyId) && Number(product.category_id) === Number(categoryId)
+    );
+    showStore();
+    renderProducts(filtered, `شركة: ${companyName}`);
+    scrollProducts();
 }
 
 
