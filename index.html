@@ -2110,15 +2110,12 @@ async function loadStore() {
         productsResult.data || [];
 
 
-    currentProductList =
-        products;
-
-
     renderCategories();
 
     renderCompanies(companies);
 
-    renderProducts(products);
+    // عرض المنتجات بشكل عشوائي عند التحميل الأول
+    goHome();
 
     renderFavorites();
 
@@ -4703,7 +4700,9 @@ function goHome() {
     });
 
 
-    renderProducts(products);
+    // إنشاء نسخة عشوائية من مصفوفة المنتجات لعرضها في الصفحة الرئيسية
+    const shuffledProducts = [...products].sort(() => Math.random() - 0.5);
+    renderProducts(shuffledProducts);
 
 }
 
@@ -4806,29 +4805,6 @@ async function refreshProductsSilently() {
     updateCart();
 
     renderFavorites();
-
-
-    if (
-        !document
-        .getElementById("storePage")
-        .classList.contains("hidden")
-    ) {
-
-        renderProducts(
-            currentProductList.map(
-                oldProduct => {
-
-                    return products.find(
-                        product =>
-                            Number(product.id) ===
-                            Number(oldProduct.id)
-                    ) || oldProduct;
-
-                }
-            ).filter(Boolean)
-        );
-
-    }
 
 }
 
