@@ -2269,13 +2269,12 @@ function getStock(product) {
 
 
 /* =====================================================
-   PRODUCT CARD
+   PRODUCT CARD (ترتيب المتوفر أعلى غير المتوفر)
 ===================================================== */
 
 function renderProducts(list, customTitle = "جميع المنتجات") {
 
-    currentProductList =
-        list;
+    currentProductList = list;
 
     document.getElementById("productsTitle").innerText = customTitle;
 
@@ -2286,53 +2285,35 @@ function renderProducts(list, customTitle = "جميع المنتجات") {
         clearBtn.classList.add("hidden");
     }
 
+    const box = document.getElementById("products");
 
-    const box =
-        document.getElementById(
-            "products"
-        );
-
-
-    document.getElementById(
-        "productCount"
-    ).innerText =
-        `${list.length} منتج`;
-
+    document.getElementById("productCount").innerText = `${list.length} منتج`;
 
     if (!list.length) {
-
         box.innerHTML = `
-
-            <div
-                class="col-span-full bg-white rounded-2xl p-12 text-center text-gray-400">
-
+            <div class="col-span-full bg-white rounded-2xl p-12 text-center text-gray-400">
                 لا توجد منتجات متاحة هنا حاليًا
-
             </div>
-
         `;
-
         return;
-
     }
 
+    // فرز المنتجات: المتوفرة أولاً (المخزون > 0)، ثم غير المتوفرة (المخزون <= 0)
+    const sortedList = [...list].sort((a, b) => {
+        const stockA = getStock(a);
+        const stockB = getStock(b);
+        const availableA = stockA > 0 ? 1 : 0;
+        const availableB = stockB > 0 ? 1 : 0;
+        return availableB - availableA; // المتوفر يأتي في الأعلى
+    });
 
-    box.innerHTML =
+    box.innerHTML = sortedList.map(product => {
 
-        list.map(product => {
-
-            const stock =
-                getStock(product);
-
-            const unavailable =
-                stock <= 0;
-
-            const favorite =
-                isFavorite(product.id);
-
+            const stock = getStock(product);
+            const unavailable = stock <= 0;
+            const favorite = isFavorite(product.id);
 
             return `
-
                 <article
                     class="product-card rounded-3xl overflow-hidden">
 
@@ -2588,7 +2569,14 @@ function openDynamicCategoryPage(categoryId, categoryName, categoryDesc) {
     if (!catProducts.length) {
         prodBox.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-12 text-center text-gray-400">لا توجد منتجات متاحة في هذا القسم حاليًا</div>`;
     } else {
-        prodBox.innerHTML = catProducts.map(product => {
+        // فرز منتجات القسم بحيث المتوفر أولاً
+        const sortedCatProducts = [...catProducts].sort((a, b) => {
+            const stockA = getStock(a);
+            const stockB = getStock(b);
+            return (stockB > 0 ? 1 : 0) - (stockA > 0 ? 1 : 0);
+        });
+
+        prodBox.innerHTML = sortedCatProducts.map(product => {
             const stock = getStock(product);
             const unavailable = stock <= 0;
             const favorite = isFavorite(product.id);
